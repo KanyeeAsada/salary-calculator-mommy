@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salary & Budget Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #2563eb;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .results {
+      margin-top: 25px;
+      background: #eef4ff;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+      color: #2563eb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Salary & Budget Calculator</h1>
+    <p style="text-align:center;">Calculate yearly income and see how to split your money.</p>
+
+    <div class="form-grid">
+      <div>
+        <label>Hourly Pay ($)</label>
+        <input type="number" id="hourlyPay" value="23.93" step="0.01">
+      </div>
+
+      <div>
+        <label>Hours Per Week</label>
+        <input type="number" id="hoursPerWeek" value="40">
+      </div>
+
+      <div>
+        <label>Tax / Deductions %</label>
+        <input type="number" id="taxRate" value="22">
+      </div>
+    </div>
+
+    <button onclick="calculateBudget()">Calculate</button>
+
+    <div class="results" id="results" style="display:none;">
+      <h2>Your Income Estimate</h2>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Gross Yearly</h3>
+          <p id="grossYearly"></p>
+        </div>
+
+        <div class="card">
+          <h3>Gross Monthly</h3>
+          <p id="grossMonthly"></p>
+        </div>
+
+        <div class="card">
+          <h3>Take-Home Yearly</h3>
+          <p id="netYearly"></p>
+        </div>
+
+        <div class="card">
+          <h3>Take-Home Monthly</h3>
+          <p id="netMonthly"></p>
+        </div>
+      </div>
+
+      <h2>Suggested Monthly Budget Split</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Percent</th>
+            <th>Monthly Amount</th>
+          </tr>
+        </thead>
+        <tbody id="budgetTable"></tbody>
+      </table>
+
+      <p class="note">
+        This is a simple estimate. Actual taxes and expenses may be different.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function formatMoney(amount) {
+      return "$" + amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function calculateBudget() {
+      const hourlyPay = parseFloat(document.getElementById("hourlyPay").value);
+      const hoursPerWeek = parseFloat(document.getElementById("hoursPerWeek").value);
+      const taxRate = parseFloat(document.getElementById("taxRate").value) / 100;
+
+      const grossYearly = hourlyPay * hoursPerWeek * 52;
+      const grossMonthly = grossYearly / 12;
+      const netYearly = grossYearly * (1 - taxRate);
+      const netMonthly = netYearly / 12;
+
+      document.getElementById("grossYearly").textContent = formatMoney(grossYearly);
+      document.getElementById("grossMonthly").textContent = formatMoney(grossMonthly);
+      document.getElementById("netYearly").textContent = formatMoney(netYearly);
+      document.getElementById("netMonthly").textContent = formatMoney(netMonthly);
+
+      const budget = [
+        ["Housing / Rent", 30],
+        ["Utilities / Internet", 7],
+        ["Food / Groceries", 12],
+        ["Transportation", 10],
+        ["Savings / Emergency Fund", 10],
+        ["Retirement", 8],
+        ["Health / Insurance", 8],
+        ["Debt Payments", 5],
+        ["Personal / Fun", 5],
+        ["Education / Career Growth", 5]
+      ];
+
+      const table = document.getElementById("budgetTable");
+      table.innerHTML = "";
+
+      budget.forEach(item => {
+        const category = item[0];
+        const percent = item[1];
+        const amount = netMonthly * (percent / 100);
+
+        table.innerHTML += `
+          <tr>
+            <td>${category}</td>
+            <td>${percent}%</td>
+            <td>${formatMoney(amount)}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("results").style.display = "block";
+    }
+
+    calculateBudget();
+  </script>
+
+</body>
+</html>
