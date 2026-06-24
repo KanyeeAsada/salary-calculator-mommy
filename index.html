@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Salary & Budget Calculator</title>
+  <title>Salary & Expense Calculator</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,7 +15,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 950px;
       margin: auto;
       background: white;
       padding: 25px;
@@ -26,11 +27,10 @@
       text-align: center;
     }
 
-    .form-grid {
+    .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
-      margin-bottom: 20px;
     }
 
     label {
@@ -44,28 +44,34 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      box-sizing: border-box;
     }
 
     button {
-      width: 100%;
-      padding: 14px;
-      background: #2563eb;
-      color: white;
-      font-size: 18px;
+      padding: 12px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      font-size: 16px;
     }
 
-    button:hover {
-      background: #1d4ed8;
+    .calculate {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      font-size: 18px;
+      margin-top: 20px;
     }
 
-    .results {
-      margin-top: 25px;
-      background: #eef4ff;
-      padding: 20px;
-      border-radius: 12px;
+    .add {
+      background: #16a34a;
+      color: white;
+      margin-top: 15px;
+    }
+
+    .delete {
+      background: #dc2626;
+      color: white;
     }
 
     .cards {
@@ -76,11 +82,10 @@
     }
 
     .card {
-      background: white;
+      background: #eef4ff;
       padding: 15px;
       border-radius: 12px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .card h3 {
@@ -95,14 +100,31 @@
     }
 
     th, td {
-      padding: 12px;
+      padding: 10px;
       border-bottom: 1px solid #ddd;
-      text-align: left;
     }
 
     th {
       background: #2563eb;
       color: white;
+      text-align: left;
+    }
+
+    .summary {
+      margin-top: 25px;
+      background: #eef4ff;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .positive {
+      color: green;
+      font-weight: bold;
+    }
+
+    .negative {
+      color: red;
+      font-weight: bold;
     }
 
     .note {
@@ -113,13 +135,18 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
-    <h1>Salary & Budget Calculator</h1>
-    <p style="text-align:center;">Calculate yearly income and see how to split your money.</p>
+    <h1>Salary & Expense Calculator</h1>
+    <p style="text-align:center;">
+      Calculate your yearly income and choose exactly how your money is split.
+    </p>
 
-    <div class="form-grid">
+    <h2>Income</h2>
+
+    <div class="grid">
       <div>
         <label>Hourly Pay ($)</label>
         <input type="number" id="hourlyPay" value="23.93" step="0.01">
@@ -136,50 +163,79 @@
       </div>
     </div>
 
-    <button onclick="calculateBudget()">Calculate</button>
+    <h2>Monthly Expenses</h2>
 
-    <div class="results" id="results" style="display:none;">
-      <h2>Your Income Estimate</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Monthly Amount</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
 
-      <div class="cards">
-        <div class="card">
-          <h3>Gross Yearly</h3>
-          <p id="grossYearly"></p>
-        </div>
+      <tbody id="expenseTable">
+        <tr>
+          <td><input type="text" value="Housing / Rent"></td>
+          <td><input type="number" value="1200"></td>
+          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+        </tr>
+        <tr>
+          <td><input type="text" value="Utilities"></td>
+          <td><input type="number" value="200"></td>
+          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+        </tr>
+        <tr>
+          <td><input type="text" value="Food / Groceries"></td>
+          <td><input type="number" value="450"></td>
+          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
 
-        <div class="card">
-          <h3>Gross Monthly</h3>
-          <p id="grossMonthly"></p>
-        </div>
+    <button class="add" onclick="addExpense()">+ Add Expense Category</button>
 
-        <div class="card">
-          <h3>Take-Home Yearly</h3>
-          <p id="netYearly"></p>
-        </div>
+    <button class="calculate" onclick="calculateBudget()">Calculate Budget</button>
 
-        <div class="card">
-          <h3>Take-Home Monthly</h3>
-          <p id="netMonthly"></p>
-        </div>
+    <div class="cards">
+      <div class="card">
+        <h3>Gross Yearly</h3>
+        <p id="grossYearly">$0.00</p>
       </div>
 
-      <h2>Suggested Monthly Budget Split</h2>
+      <div class="card">
+        <h3>Take-Home Monthly</h3>
+        <p id="netMonthly">$0.00</p>
+      </div>
 
+      <div class="card">
+        <h3>Total Expenses</h3>
+        <p id="totalExpenses">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Money Left</h3>
+        <p id="moneyLeft">$0.00</p>
+      </div>
+    </div>
+
+    <div class="summary">
+      <h2>Expense Breakdown</h2>
       <table>
         <thead>
           <tr>
             <th>Category</th>
-            <th>Percent</th>
-            <th>Monthly Amount</th>
+            <th>Amount</th>
+            <th>% of Take-Home Pay</th>
           </tr>
         </thead>
-        <tbody id="budgetTable"></tbody>
+        <tbody id="breakdownTable"></tbody>
       </table>
-
-      <p class="note">
-        This is a simple estimate. Actual taxes and expenses may be different.
-      </p>
     </div>
+
+    <p class="note">
+      This is a simple estimate. Actual taxes and deductions may be different.
+    </p>
   </div>
 
   <script>
@@ -190,52 +246,66 @@
       });
     }
 
+    function addExpense() {
+      const table = document.getElementById("expenseTable");
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td><input type="text" placeholder="Example: Car Payment"></td>
+        <td><input type="number" placeholder="0"></td>
+        <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+      `;
+
+      table.appendChild(row);
+    }
+
+    function deleteRow(button) {
+      button.parentElement.parentElement.remove();
+      calculateBudget();
+    }
+
     function calculateBudget() {
-      const hourlyPay = parseFloat(document.getElementById("hourlyPay").value);
-      const hoursPerWeek = parseFloat(document.getElementById("hoursPerWeek").value);
-      const taxRate = parseFloat(document.getElementById("taxRate").value) / 100;
+      const hourlyPay = parseFloat(document.getElementById("hourlyPay").value) || 0;
+      const hoursPerWeek = parseFloat(document.getElementById("hoursPerWeek").value) || 0;
+      const taxRate = (parseFloat(document.getElementById("taxRate").value) || 0) / 100;
 
       const grossYearly = hourlyPay * hoursPerWeek * 52;
-      const grossMonthly = grossYearly / 12;
       const netYearly = grossYearly * (1 - taxRate);
       const netMonthly = netYearly / 12;
 
-      document.getElementById("grossYearly").textContent = formatMoney(grossYearly);
-      document.getElementById("grossMonthly").textContent = formatMoney(grossMonthly);
-      document.getElementById("netYearly").textContent = formatMoney(netYearly);
-      document.getElementById("netMonthly").textContent = formatMoney(netMonthly);
+      let totalExpenses = 0;
+      const breakdownTable = document.getElementById("breakdownTable");
+      breakdownTable.innerHTML = "";
 
-      const budget = [
-        ["Housing / Rent", 30],
-        ["Utilities / Internet", 7],
-        ["Food / Groceries", 12],
-        ["Transportation", 10],
-        ["Savings / Emergency Fund", 10],
-        ["Retirement", 8],
-        ["Health / Insurance", 8],
-        ["Debt Payments", 5],
-        ["Personal / Fun", 5],
-        ["Education / Career Growth", 5]
-      ];
+      const rows = document.querySelectorAll("#expenseTable tr");
 
-      const table = document.getElementById("budgetTable");
-      table.innerHTML = "";
+      rows.forEach(row => {
+        const category = row.children[0].querySelector("input").value || "Unnamed";
+        const amount = parseFloat(row.children[1].querySelector("input").value) || 0;
 
-      budget.forEach(item => {
-        const category = item[0];
-        const percent = item[1];
-        const amount = netMonthly * (percent / 100);
+        totalExpenses += amount;
 
-        table.innerHTML += `
+        const percent = netMonthly > 0 ? (amount / netMonthly) * 100 : 0;
+
+        breakdownTable.innerHTML += `
           <tr>
             <td>${category}</td>
-            <td>${percent}%</td>
             <td>${formatMoney(amount)}</td>
+            <td>${percent.toFixed(1)}%</td>
           </tr>
         `;
       });
 
-      document.getElementById("results").style.display = "block";
+      const moneyLeft = netMonthly - totalExpenses;
+
+      document.getElementById("grossYearly").textContent = formatMoney(grossYearly);
+      document.getElementById("netMonthly").textContent = formatMoney(netMonthly);
+      document.getElementById("totalExpenses").textContent = formatMoney(totalExpenses);
+
+      const moneyLeftElement = document.getElementById("moneyLeft");
+      moneyLeftElement.textContent = formatMoney(moneyLeft);
+      moneyLeftElement.className = moneyLeft >= 0 ? "positive" : "negative";
     }
 
     calculateBudget();
