@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Salary & Expense Calculator</title>
+
+  <title>Salary & Budget Calculator</title>
 
   <style>
     body {
@@ -15,12 +16,12 @@
     }
 
     .container {
-      max-width: 950px;
+      max-width: 1000px;
       margin: auto;
       background: white;
       padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
     }
 
     h1, h2 {
@@ -31,6 +32,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
+      margin-bottom: 15px;
     }
 
     label {
@@ -39,7 +41,7 @@
 
     input {
       width: 100%;
-      padding: 10px;
+      padding: 11px;
       margin-top: 6px;
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -48,55 +50,61 @@
     }
 
     button {
-      padding: 12px;
+      padding: 12px 16px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       font-size: 16px;
+      margin-top: 10px;
     }
 
     .calculate {
-      width: 100%;
       background: #2563eb;
       color: white;
+      width: 100%;
       font-size: 18px;
-      margin-top: 20px;
     }
 
     .add {
       background: #16a34a;
       color: white;
-      margin-top: 15px;
     }
 
     .delete {
       background: #dc2626;
       color: white;
+      margin-top: 0;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 15px;
-      margin-top: 20px;
+      margin: 20px 0;
     }
 
     .card {
       background: #eef4ff;
-      padding: 15px;
+      padding: 16px;
       border-radius: 12px;
       text-align: center;
     }
 
     .card h3 {
-      margin-bottom: 8px;
       color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 25px;
+      margin-top: 18px;
     }
 
     th, td {
@@ -133,15 +141,25 @@
       text-align: center;
       margin-top: 15px;
     }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        font-size: 14px;
+      }
+
+      .delete {
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
   <div class="container">
-    <h1>Salary & Expense Calculator</h1>
+    <h1>Salary & Budget Calculator</h1>
     <p style="text-align:center;">
-      Calculate your yearly income and choose exactly how your money is split.
+      Type your income and expenses to see how much money you make and how much is left.
     </p>
 
     <h2>Income</h2>
@@ -149,17 +167,41 @@
     <div class="grid">
       <div>
         <label>Hourly Pay ($)</label>
-        <input type="number" id="hourlyPay" value="23.93" step="0.01">
+        <input type="number" id="hourlyPay" value="23.93" step="0.01" oninput="calculateAll()">
       </div>
 
       <div>
         <label>Hours Per Week</label>
-        <input type="number" id="hoursPerWeek" value="40">
+        <input type="number" id="hoursPerWeek" value="40" oninput="calculateAll()">
       </div>
 
       <div>
-        <label>Tax / Deductions %</label>
-        <input type="number" id="taxRate" value="22">
+        <label>Taxes & Deductions (%)</label>
+        <input type="number" id="taxRate" value="22" step="0.1" oninput="calculateAll()">
+      </div>
+    </div>
+
+    <button class="calculate" onclick="calculateAll()">Calculate Income</button>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Gross Yearly</h3>
+        <p id="grossYearly">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Gross Monthly</h3>
+        <p id="grossMonthly">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Take-Home Yearly</h3>
+        <p id="netYearly">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Take-Home Monthly</h3>
+        <p id="netMonthly">$0.00</p>
       </div>
     </div>
 
@@ -176,65 +218,87 @@
 
       <tbody id="expenseTable">
         <tr>
-          <td><input type="text" value="Housing / Rent"></td>
-          <td><input type="number" value="1200"></td>
-          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+          <td>
+            <input type="text" value="Housing / Rent" oninput="calculateAll()">
+          </td>
+          <td>
+            <input type="number" value="1200" oninput="calculateAll()">
+          </td>
+          <td>
+            <button class="delete" onclick="deleteRow(this)">Delete</button>
+          </td>
         </tr>
+
         <tr>
-          <td><input type="text" value="Utilities"></td>
-          <td><input type="number" value="200"></td>
-          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+          <td>
+            <input type="text" value="Utilities" oninput="calculateAll()">
+          </td>
+          <td>
+            <input type="number" value="200" oninput="calculateAll()">
+          </td>
+          <td>
+            <button class="delete" onclick="deleteRow(this)">Delete</button>
+          </td>
         </tr>
+
         <tr>
-          <td><input type="text" value="Food / Groceries"></td>
-          <td><input type="number" value="450"></td>
-          <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
+          <td>
+            <input type="text" value="Food / Groceries" oninput="calculateAll()">
+          </td>
+          <td>
+            <input type="number" value="450" oninput="calculateAll()">
+          </td>
+          <td>
+            <button class="delete" onclick="deleteRow(this)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
 
     <button class="add" onclick="addExpense()">+ Add Expense Category</button>
 
-    <button class="calculate" onclick="calculateBudget()">Calculate Budget</button>
+    <button class="calculate" onclick="calculateAll()">Calculate Budget</button>
 
     <div class="cards">
       <div class="card">
-        <h3>Gross Yearly</h3>
-        <p id="grossYearly">$0.00</p>
-      </div>
-
-      <div class="card">
-        <h3>Take-Home Monthly</h3>
-        <p id="netMonthly">$0.00</p>
-      </div>
-
-      <div class="card">
-        <h3>Total Expenses</h3>
+        <h3>Total Monthly Expenses</h3>
         <p id="totalExpenses">$0.00</p>
       </div>
 
       <div class="card">
-        <h3>Money Left</h3>
+        <h3>Money Left Monthly</h3>
         <p id="moneyLeft">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Money Left Yearly</h3>
+        <p id="moneyLeftYearly">$0.00</p>
+      </div>
+
+      <div class="card">
+        <h3>Savings Rate</h3>
+        <p id="savingsRate">0%</p>
       </div>
     </div>
 
     <div class="summary">
       <h2>Expense Breakdown</h2>
+
       <table>
         <thead>
           <tr>
             <th>Category</th>
-            <th>Amount</th>
+            <th>Monthly Amount</th>
             <th>% of Take-Home Pay</th>
           </tr>
         </thead>
+
         <tbody id="breakdownTable"></tbody>
       </table>
     </div>
 
     <p class="note">
-      This is a simple estimate. Actual taxes and deductions may be different.
+      This is an estimate. Your actual taxes, insurance, and deductions may be different.
     </p>
   </div>
 
@@ -246,33 +310,21 @@
       });
     }
 
-    function addExpense() {
-      const table = document.getElementById("expenseTable");
-
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td><input type="text" placeholder="Example: Car Payment"></td>
-        <td><input type="number" placeholder="0"></td>
-        <td><button class="delete" onclick="deleteRow(this)">Delete</button></td>
-      `;
-
-      table.appendChild(row);
-    }
-
-    function deleteRow(button) {
-      button.parentElement.parentElement.remove();
-      calculateBudget();
-    }
-
-    function calculateBudget() {
+    function calculateAll() {
       const hourlyPay = parseFloat(document.getElementById("hourlyPay").value) || 0;
       const hoursPerWeek = parseFloat(document.getElementById("hoursPerWeek").value) || 0;
       const taxRate = (parseFloat(document.getElementById("taxRate").value) || 0) / 100;
 
       const grossYearly = hourlyPay * hoursPerWeek * 52;
+      const grossMonthly = grossYearly / 12;
+
       const netYearly = grossYearly * (1 - taxRate);
       const netMonthly = netYearly / 12;
+
+      document.getElementById("grossYearly").textContent = formatMoney(grossYearly);
+      document.getElementById("grossMonthly").textContent = formatMoney(grossMonthly);
+      document.getElementById("netYearly").textContent = formatMoney(netYearly);
+      document.getElementById("netMonthly").textContent = formatMoney(netMonthly);
 
       let totalExpenses = 0;
       const breakdownTable = document.getElementById("breakdownTable");
@@ -281,8 +333,11 @@
       const rows = document.querySelectorAll("#expenseTable tr");
 
       rows.forEach(row => {
-        const category = row.children[0].querySelector("input").value || "Unnamed";
-        const amount = parseFloat(row.children[1].querySelector("input").value) || 0;
+        const categoryInput = row.children[0].querySelector("input");
+        const amountInput = row.children[1].querySelector("input");
+
+        const category = categoryInput.value || "Unnamed";
+        const amount = parseFloat(amountInput.value) || 0;
 
         totalExpenses += amount;
 
@@ -298,17 +353,52 @@
       });
 
       const moneyLeft = netMonthly - totalExpenses;
+      const moneyLeftYearly = moneyLeft * 12;
+      const savingsRate = netMonthly > 0 ? (moneyLeft / netMonthly) * 100 : 0;
 
-      document.getElementById("grossYearly").textContent = formatMoney(grossYearly);
-      document.getElementById("netMonthly").textContent = formatMoney(netMonthly);
       document.getElementById("totalExpenses").textContent = formatMoney(totalExpenses);
 
       const moneyLeftElement = document.getElementById("moneyLeft");
       moneyLeftElement.textContent = formatMoney(moneyLeft);
       moneyLeftElement.className = moneyLeft >= 0 ? "positive" : "negative";
+
+      const moneyLeftYearlyElement = document.getElementById("moneyLeftYearly");
+      moneyLeftYearlyElement.textContent = formatMoney(moneyLeftYearly);
+      moneyLeftYearlyElement.className = moneyLeftYearly >= 0 ? "positive" : "negative";
+
+      const savingsRateElement = document.getElementById("savingsRate");
+      savingsRateElement.textContent = savingsRate.toFixed(1) + "%";
+      savingsRateElement.className = savingsRate >= 0 ? "positive" : "negative";
     }
 
-    calculateBudget();
+    function addExpense() {
+      const table = document.getElementById("expenseTable");
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>
+          <input type="text" placeholder="Example: Car Payment" oninput="calculateAll()">
+        </td>
+        <td>
+          <input type="number" placeholder="0" oninput="calculateAll()">
+        </td>
+        <td>
+          <button class="delete" onclick="deleteRow(this)">Delete</button>
+        </td>
+      `;
+
+      table.appendChild(row);
+      calculateAll();
+    }
+
+    function deleteRow(button) {
+      const row = button.parentElement.parentElement;
+      row.remove();
+      calculateAll();
+    }
+
+    window.onload = calculateAll;
   </script>
 
 </body>
